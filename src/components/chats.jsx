@@ -1,47 +1,49 @@
-import React from "react";
-import Ganu from "../assets/ganu.jpg";
-import Lipsa from "../assets/lipsa.jpg";
-import Kammo from "../assets/kammo.jpg";
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../firebase";
+import { ChatContext } from "../context/ChatContext.jsx";
 
 const chats = () => {
+  const [chats, setChats] = useState([]);
+
+  const { currentUser } = useContext(AuthContext);
+  const { dispatch } = useContext(ChatContext);
+
+  useEffect(() => {
+    const getChats = () => {
+      const unsub = onSnapshot(doc(db, "userChat", currentUser.uid), (doc) => {
+        setChats(doc.data());
+      });
+      return () => {
+        unsub();
+      };
+    };
+
+    currentUser.uid && getChats();
+  }, [currentUser.uid]);
+
+  console.log(Object.entries(chats));
+
+  const handleSelect = (u) => {
+    dispatch({ type: "CHANGE_USER", payload: u });
+  };
+
   return (
     <div className="chats">
-      <div className="userChat">
-        <img src={Ganu} alt="avatar" />
-        <div className="userChatInfo">
-          <span>Ganesh</span>
-          <p>Hello Kammo</p>
+      {Object.entries(chats)?.map((chat) => (
+        <div
+          className="userChat"
+          key={chat[0]}
+          onClick={() => handleSelect(chat[1].userInfo)}
+        >
+          <img src={chat[1].userInfo.phtotoURL} />
+          <div className="userChatInfo">
+            <span>{chat[1].userInfo.displayName}</span>
+            <p>{chat[1].userInfo.lastMessage?.text}</p>
+          </div>
         </div>
-      </div>
-      <div className="userChat">
-        <img src={Lipsa} alt="avatar" />
-        <div className="userChatInfo">
-          <span>Lipsa</span>
-          <p>Hello Kammo</p>
-        </div>
-      </div>
-
-      <div className="userChat">
-        <img src={Ganu} alt="avatar" />
-        <div className="userChatInfo">
-          <span>Rohit</span>
-          <p>Hello Kammo</p>
-        </div>
-      </div>
-      <div className="userChat">
-        <img src={Kammo} alt="avatar" />
-        <div className="userChatInfo">
-          <span>Pranay</span>
-          <p>Hello Kammo</p>
-        </div>
-      </div>
-      <div className="userChat">
-        <img src={Ganu} alt="avatar" />
-        <div className="userChatInfo">
-          <span>Arpan</span>
-          <p>Hello Kammo</p>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
