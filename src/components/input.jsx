@@ -34,7 +34,7 @@ const input = () => {
         },
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            await setDoc(doc(db, "chats", data.chatId), {
+            await updateDoc(doc(db, "chats", data.chatId), {
               messages: arrayUnion({
                 id: uuid(),
                 text,
@@ -47,7 +47,7 @@ const input = () => {
         }
       );
     } else {
-      await setDoc(doc(db, "chats", data.chatId), {
+      await updateDoc(doc(db, "chats", data.chatId), {
         messages: arrayUnion({
           id: uuid(),
           text: text,
@@ -56,10 +56,30 @@ const input = () => {
         }),
       });
     }
+    await updateDoc(doc(db, "userChat", currentUser.uid), {
+      [data.chatId + ".lastMessage"]: {
+        text,
+      },
+      [data.chatId + ".date"]: serverTimestamp(),
+    });
+    await updateDoc(doc(db, "userChat", data.user.uid), {
+      [data.chatId + ".lastMessage"]: {
+        text,
+      },
+      [data.chatId + ".date"]: serverTimestamp(),
+    });
+
+    setText("");
+    setImg(null);
   };
   return (
     <div className="input">
-      <input type="text" id="" placeholder="Type something..." />
+      <input
+        type="text"
+        placeholder="Type something..."
+        onChange={(e) => setText(e.target.value)}
+        value={text}
+      />
       <div className="send">
         <img src={Link} alt="Link Image" />
         <input
