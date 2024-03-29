@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import File from "../assets/imageUpload.png";
+import File from "../assets/img.png";
 import Link from "../assets/link.png";
 import { AuthContext } from "../context/AuthContext";
 import { ChatContext } from "../context/ChatContext";
