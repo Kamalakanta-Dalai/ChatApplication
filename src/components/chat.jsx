@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import Messages from "./messages.jsx";
 import Input from "./input.jsx";
-import Ganu from "../assets/ganu.jpg";
 import Cam from "../assets/camera.png";
 import Add from "../assets/add.png";
 import More from "../assets/more.png";
